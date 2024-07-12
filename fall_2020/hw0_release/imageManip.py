@@ -136,6 +136,10 @@ def rotate_image(input_image, theta):
     # 1. Create an output image with the same shape as the input
     output_image = np.zeros_like(input_image)
 
+    # In skimage, location (0, 0) is top left corner
+    # location (row_size, col_size) is bottom right corner
+
+    # the rotatation is based on the image center
     origin = np.array([input_rows/2, input_cols/2])
     for i in range(input_rows):
         for j in range(input_cols):
@@ -144,7 +148,6 @@ def rotate_image(input_image, theta):
             input_i, input_j = int(input_point[0]), int(input_point[1])
             if 0 <= input_i < input_rows and 0 <= input_j < input_cols:
                 output_image[i, j, :] = input_image[input_i, input_j,:]
-     
 
     # 3. Return the output image
     return output_image

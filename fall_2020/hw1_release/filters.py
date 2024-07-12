@@ -30,6 +30,9 @@ def conv_nested(image, kernel):
 
     for m in range(Hi):
         for n in range(Wi):
+            # Note: int(-5/2) = -2, while -5//2 = -3
+            # i, j should start from -2, end at 2, when Hk or Wk is 5
+            # In computer vision, kernels/filters used in convolutional operations are typically designed to have odd dimensions in both height and width.
             for i in range(int(-Hk/2), int(Hk/2) + 1):
                 for j in range(int(-Wk/2), int(Wk/2) + 1):
                     k_x, k_y = i + int(Hk/2), j + int(Wk/2) 
@@ -37,7 +40,8 @@ def conv_nested(image, kernel):
                     
                     if 0 <= img_x < Hi and 0 <= img_y < Wi:
                         out[m, n] += kernel[k_x, k_y] * image[img_x, img_y]
-
+    # In <DL> book, (i, j) is one location in an image, (m, n) is variable for kernel sliding
+    # In CS 131, (m, n) is one location in an image, (k, j) is variable for kernel sliding. In this code, use (i, j) for variable
     return out
 
 def zero_pad(image, pad_height, pad_width):
@@ -171,9 +175,9 @@ def normalized_cross_correlation(f, g):
 
     for i in range(Hf):
         for j in range(Wf):   
-            sub_f = padded_f[i:i+Hg, j:j+Wg]
-            normalized_sub_f = (sub_f - np.mean(sub_f))/np.std(sub_f)
-            out[i, j] = np.sum(normalized_g*normalized_sub_f)
+            patch_f = padded_f[i:i+Hg, j:j+Wg]
+            normalized_patch_f = (patch_f - np.mean(patch_f))/np.std(patch_f)
+            out[i, j] = np.sum(normalized_g*normalized_patch_f)
             
     return out
                                
