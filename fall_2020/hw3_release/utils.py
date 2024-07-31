@@ -107,11 +107,15 @@ def get_output_space(img_ref, imgs, transforms):
         r, c = imgs[i].shape
         H = transforms[i]
         corners = np.array([[0, 0], [r, 0], [0, c], [r, c]])
-        # y = A*p, if A = [[B 1]], then p = [[m], 
-        #                                    [c]], for line y = m*x + c
-        
-        # here 'x' is input (x1,y1) map to 'y' output(x2, y2)
-        # m = H[:2,:2], c = H[2,:2]
+        # X1 = X2H
+        # [x1, y1, 1] = [x2, y2, 1][[a, c, 0],
+        #                           [b, d, 0],
+        #                           [t_x, t_y, 1]]
+        #
+        # warped_corners, corners are in Cartesian coordinate, don't have 1
+        # [x1, y1] = [x2, y2][[a, c], + [t_x, t_y]
+        #                     [b, d]]
+        #          = [x2, y2]H[:2,:2] + H[2, :2]
         warped_corners = corners.dot(H[:2,:2]) + H[2,:2]
         all_corners.append(warped_corners)
 
@@ -137,10 +141,10 @@ def warp_image(img, H, output_shape, offset):
     # the pixel value is determined from the input image at position
     # np.dot(matrix, o) + offset.
     # If you have a matrix for the ‘push’ transformation, transforming input (img) to output (img * H = p1). Use its inverse (numpy.linalg.inv) in this function.
-    # H = [[a,b,0],          Hinv = [[o,p,q],
-    #      [c,d,0],   ==>            [m,n,s],    
-    #      [e,f,1]]                  [0,0,1]]
-    # H = [[m]        ==>    Hinv = [[m, b]]
+    # H = [[a,b,0],          Hinv.T = [[o,p,q],
+    #      [c,d,0],   ==>              [m,n,s],
+    #      [e,f,1]]                    [0,0,1]]
+    # H = [[m]        ==>    Hinv.T = [[m, b]]
     #      [c]]
     Hinv = np.linalg.inv(H)
     m = Hinv.T[:2,:2]

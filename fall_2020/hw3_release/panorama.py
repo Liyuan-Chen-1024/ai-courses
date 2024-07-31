@@ -84,9 +84,9 @@ def simple_descriptor(patch):
     """
     H, W = patch.shape
     
-    normalized_path = (patch - np.mean(patch))/np.std(patch)
+    normalized_patch = (patch - np.mean(patch))/np.std(patch)
     
-    feature = normalized_path.flatten()
+    feature = normalized_patch.flatten()
     
     return feature
 
@@ -107,8 +107,7 @@ def describe_keypoints(image, keypoints, desc_func, patch_size=16):
     image.astype(np.float32)
     desc = []
 
-    for i, kp in enumerate(keypoints):
-        y, x = kp
+    for y, x in keypoints:
         patch = image[y-(patch_size//2):y+((patch_size+1)//2),
                       x-(patch_size//2):x+((patch_size+1)//2)]
         desc.append(desc_func(patch))
@@ -179,8 +178,8 @@ def fit_affine_matrix(p1, p2):
     p2 = pad(p2)
 
     H = np.linalg.lstsq(p2, p1, rcond=None)[0]
-    # Sometimes numerical issues cause least-squares to produce the last
-    # column which is not exactly [0, 0, 1]
+    # Sometimes numerical issues cause least-squares to produce
+    # the last column which is not exactly [0, 0, 1]
     H[:,2] = np.array([0, 0, 1])
     return H
 
@@ -255,6 +254,8 @@ def ransac(keypoints1, keypoints2, matches, n_iters=200, threshold=20):
         # 1. Select random set of matches
         idx = np.random.choice(N, n_samples, replace=False)
         samples = matches[idx]
+        # np.random.shuffle(matches)
+        # samples = matches[:n_samples]
         sample1 = keypoints1[samples[:,0]]
         sample2 = keypoints2[samples[:,1]]
         
