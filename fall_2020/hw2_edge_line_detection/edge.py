@@ -303,7 +303,7 @@ def hough_transform(img):
     H, W = img.shape
     diag_len = int(np.ceil(np.sqrt(W * W + H * H)))
     rhos = np.linspace(-diag_len, diag_len, diag_len * 2 + 1)  # rho value range: [-rho_max, rho_max]
-    thetas = np.deg2rad(np.arange(-90.0, 90.0))                
+    thetas = np.deg2rad(np.linspace(-90.0, 90.0, 180 + 1))                
 
     # Cache some reusable values
     cos_t = np.cos(thetas)
@@ -320,9 +320,7 @@ def hough_transform(img):
     for i in range(len(ys)):
         x, y = xs[i], ys[i]
         rho_t = x*cos_t + y*sin_t
-        acc_rho = np.int64(np.floor(rho_t)) + diag_len
-        acc_theta = np.arange(0, 180)
-        accumulator[acc_rho, acc_theta] += 1
-        
-
+        for i in range(len(rho_t)):
+            rho_index = np.argmin(np.abs(rhos - rho_t[i]))
+            accumulator[rho_index, i] += 1
     return accumulator, rhos, thetas
