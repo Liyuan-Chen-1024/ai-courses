@@ -15,10 +15,13 @@ def visualize_mean_color_image(img, segments):
     mean_color_img = np.zeros(img.shape)
 
     for i in range(k):
-        # segments == i returns H*W matrix of True/False
-        # img[segments == i] returns a list of color (r,g,b)
-        # np.mean(img[segments == i], axis=0) returns mean color (r,g,b) of segments=i
-        mean_color = np.mean(img[segments == i], axis=0)  
+        # segments == i return boolean mask - H*W matrix
+        # img[segments == i] 2D boolean indexing on 3D array, return a list of color vector with segment = i
+        #                                                            (# of True in boolean mask) * (# of 3rd dimension features)
+        # np.mean(img[segments == i], axis=0) returns mean color for segments = i
+        mean_color = np.mean(img[segments == i], axis=0)
+
+        # set the segment = i with mean_color
         mean_color_img[segments == i] = mean_color
 
     plt.imshow(mean_color_img)
